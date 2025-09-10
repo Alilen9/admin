@@ -127,9 +127,12 @@ export default function ReviewPage() {
         <header className="flex justify-between items-center p-6 bg-white  ">
           <h1 className="text-xl font-bold">{activeMenu}</h1>
           <div className="flex items-center gap-4">
-            <Button className="bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full px-4 py-2 flex items-center gap-2 shadow-lg">
-              New Review
-            </Button>
+            <Link href="/reviews/new">
+  <Button className="bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full px-4 py-2 flex items-center gap-2 shadow-lg">
+    New Review
+  </Button>
+</Link>
+
             <button className="relative p-2 rounded-full bg-gray-200 hover:bg-gray-300">
                           <Bell className="h-5 w-5 text-gray-600" />
                           <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">

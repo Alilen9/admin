@@ -13,22 +13,29 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function CustomersPage() {
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
+  const [filter, setFilter] = useState<"all" | "monitored" | "unmonitored">("all");
 
   const customers = [
-    { id: 1, name: "Alexander Mule", email: "curtis@example.com", products: 68, progress: 70, date: "25 July 2025", status: "Accepted", avatar: "https://i.pravatar.cc/150?img=1" },
-    { id: 2, name: "Jenny Wilson", email: "jenny@example.com", products: 48, progress: 40, date: "16 July 2025", status: "Overdue", avatar: "https://i.pravatar.cc/150?img=2" },
-    { id: 3, name: "Annetta Black", email: "annetta@example.com", products: 105, progress: 90, date: "05 July 2025", status: "Pending", avatar: "https://i.pravatar.cc/150?img=3" },
-    { id: 4, name: "Leslie Alexander", email: "leslie@example.com", products: 78, progress: 60, date: "01 July 2025", status: "Active", avatar: "https://i.pravatar.cc/150?img=4" },
+    { id: 1, name: "Alexander Mule", email: "curtis@example.com", products: 68, progress: 70, date: "25 July 2025", status: "Accepted", monitored: true, avatar: "https://i.pravatar.cc/150?img=1" },
+    { id: 2, name: "Jenny Wilson", email: "jenny@example.com", products: 48, progress: 40, date: "16 July 2025", status: "Overdue", monitored: false, avatar: "https://i.pravatar.cc/150?img=2" },
+    { id: 3, name: "Annetta Black", email: "annetta@example.com", products: 105, progress: 90, date: "05 July 2025", status: "Pending", monitored: true, avatar: "https://i.pravatar.cc/150?img=3" },
+    { id: 4, name: "Leslie Alexander", email: "leslie@example.com", products: 78, progress: 60, date: "01 July 2025", status: "Active", monitored: false, avatar: "https://i.pravatar.cc/150?img=4" },
   ];
 
-  const filteredCustomers = customers.filter(
-    (customer) =>
+  const filteredCustomers = customers.filter((customer) => {
+    const matchesSearch =
       customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      customer.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+      customer.email.toLowerCase().includes(searchTerm.toLowerCase());
+
+    if (filter === "monitored") return matchesSearch && customer.monitored;
+    if (filter === "unmonitored") return matchesSearch && !customer.monitored;
+    return matchesSearch;
+  });
 
   const getProgressColor = (progress: number) => {
     if (progress >= 70) return "bg-green-500";
@@ -42,12 +49,10 @@ export default function CustomersPage() {
       <aside className="w-64 bg-black/90 flex flex-col p-4">
         {/* Top Section */}
         <div>
-          {/* Logo */}
           <div className="flex items-center gap-2 mb-6">
             <span className="text-2xl font-bold text-yellow-400">ADMIN</span>
           </div>
 
-          {/* Sidebar Search */}
           <div className="relative mb-4">
             <input
               type="text"
@@ -58,7 +63,6 @@ export default function CustomersPage() {
             />
           </div>
 
-          {/* Navigation */}
           <div className="space-y-2">
             <Link href="/dashboard">
               <Button variant="ghost" className="w-full justify-start text-gray-300 hover:bg-gray-800">
@@ -109,7 +113,10 @@ export default function CustomersPage() {
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-bold text-gray-900">Customers</h2>
           <div className="flex items-center gap-4">
-            <Button className="bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full px-4 py-2 flex items-center gap-2 shadow-lg">
+            <Button
+              onClick={() => router.push("/invoices/new")}
+              className="bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full px-4 py-2 flex items-center gap-2 shadow-lg"
+            >
               <Plus className="h-4 w-4" /> Create New Invoice
             </Button>
             <button className="relative p-2 rounded-full bg-gray-200 hover:bg-gray-300">
@@ -150,9 +157,9 @@ export default function CustomersPage() {
             <div className="flex justify-between items-center mb-4 border-b pb-3 p-4">
               <h3 className="text-lg font-semibold text-gray-800">Customer Movements</h3>
               <div className="flex items-center gap-4 text-sm text-gray-600">
-                <span className="font-semibold text-black">View all</span>
-                <span>Monitored</span>
-                <span>Unmonitored</span>
+                <button onClick={() => setFilter("all")} className="font-semibold text-black">View all</button>
+                <button onClick={() => setFilter("monitored")}>Monitored</button>
+                <button onClick={() => setFilter("unmonitored")}>Unmonitored</button>
               </div>
             </div>
 
@@ -167,7 +174,8 @@ export default function CustomersPage() {
             {filteredCustomers.map((customer) => (
               <div
                 key={customer.id}
-                className="grid grid-cols-6 gap-4 items-center py-3 px-4 border-b last:border-b-0 hover:bg-gray-50 transition-colors"
+                onClick={() => router.push(`/customers/${customer.id}`)}
+                className="grid grid-cols-6 gap-4 items-center py-3 px-4 border-b last:border-b-0 hover:bg-gray-50 transition-colors cursor-pointer"
               >
                 <div className="col-span-2 flex items-center gap-3">
                   <Avatar className="h-9 w-9">
